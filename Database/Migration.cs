@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using MySqlConnector;
 
-namespace CS2_SimpleAdmin.Database;
+namespace CS2_SimplerAdmin.Database;
 
 public class Migration(Database database)
 {
 	public void ExecuteMigrations()
 	{
-		var migrationsDirectory = CS2_SimpleAdmin.Instance.ModuleDirectory + "/Database/Migrations";
+		var migrationsDirectory = CS2_SimplerAdmin.Instance.ModuleDirectory + "/Database/Migrations";
 
 		var files = Directory.GetFiles(migrationsDirectory, "*.sql")
 							 .OrderBy(f => f);
@@ -41,7 +41,7 @@ public class Migration(Database database)
 			// Update the last applied migration version
 			UpdateLastAppliedVersion(connection, version);
 
-			CS2_SimpleAdmin._logger?.LogInformation($"Migration \"{version}\" successfully applied.");
+			CS2_SimplerAdmin._logger?.LogInformation($"Migration \"{version}\" successfully applied.");
 		}
 	}
 

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>CS2_SimpleAdmin</RootNamespace>
+    <RootNamespace>CS2_SimplerAdmin</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -12,7 +12,6 @@
   <ItemGroup>
     <PackageReference Include="CounterStrikeSharp.API" Version="1.0.225" />
     <PackageReference Include="Dapper" Version="2.1.35" />
-    <PackageReference Include="Discord.Net.Webhook" Version="3.14.1" />
     <PackageReference Include="MySqlConnector" Version="2.3.7" />
     <PackageReference Include="Newtonsoft.Json" Version="*" />
   </ItemGroup>

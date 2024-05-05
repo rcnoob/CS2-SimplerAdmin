@@ -3,18 +3,17 @@ using CounterStrikeSharp.API.Core.Attributes;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Commands.Targeting;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
-using Discord.Webhook;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
 using System.Collections.Concurrent;
 
-namespace CS2_SimpleAdmin;
+namespace CS2_SimplerAdmin;
 
 [MinimumApiVersion(220)]
-public partial class CS2_SimpleAdmin : BasePlugin, IPluginConfig<CS2_SimpleAdminConfig>
+public partial class CS2_SimplerAdmin : BasePlugin, IPluginConfig<CS2_SimplerAdminConfig>
 {
-	public static CS2_SimpleAdmin Instance { get; private set; } = new();
+	public static CS2_SimplerAdmin Instance { get; private set; } = new();
 
 	public static IStringLocalizer? _localizer;
 	public static readonly Dictionary<string, int> VoteAnswers = [];
@@ -24,22 +23,18 @@ public partial class CS2_SimpleAdmin : BasePlugin, IPluginConfig<CS2_SimpleAdmin
 	private static bool _tagsDetected;
 	public static bool VoteInProgress = false;
 	public static int? ServerId = null;
-
-	public static DiscordWebhookClient? DiscordWebhookClientLog;
-	public static DiscordWebhookClient? DiscordWebhookClientPenalty;
-
 	private string _dbConnectionString = string.Empty;
 	private static Database.Database? _database;
 
 	internal static ILogger? _logger;
 
 	private static MemoryFunctionVoid<CBasePlayerController, CCSPlayerPawn, bool, bool>? _cBasePlayerControllerSetPawnFunc;
-	public override string ModuleName => "CS2-SimpleAdmin" + (Helper.IsDebugBuild ? " (DEBUG)" : " (RELEASE)");
-	public override string ModuleDescription => "Simple admin plugin for Counter-Strike 2 :)";
-	public override string ModuleAuthor => "daffyy & Dliix66";
-	public override string ModuleVersion => "1.4.3d";
+	public override string ModuleName => "CS2-SimplerAdmin";
+	public override string ModuleDescription => "A de-bloated build of CS2-SimpleAdmin";
+	public override string ModuleAuthor => "rc";
+	public override string ModuleVersion => "1.0.0";
 
-	public CS2_SimpleAdminConfig Config { get; set; } = new();
+	public CS2_SimplerAdminConfig Config { get; set; } = new();
 
 	public override void Load(bool hotReload)
 	{
@@ -64,11 +59,11 @@ public partial class CS2_SimpleAdmin : BasePlugin, IPluginConfig<CS2_SimpleAdmin
 		RemoveCommandListener("say_team", OnCommandTeamSay, HookMode.Post);
 	}
 
-	public void OnConfigParsed(CS2_SimpleAdminConfig config)
+	public void OnConfigParsed(CS2_SimplerAdminConfig config)
 	{
 		if (config.DatabaseHost.Length < 1 || config.DatabaseName.Length < 1 || config.DatabaseUser.Length < 1)
 		{
-			throw new Exception("[CS2-SimpleAdmin] You need to setup Database credentials in config!");
+			throw new Exception("[CS2-SimplerAdmin] You need to setup Database credentials in config!");
 		}
 
 		Instance = this;
@@ -107,12 +102,7 @@ public partial class CS2_SimpleAdmin : BasePlugin, IPluginConfig<CS2_SimpleAdmin
 		}
 
 		_localizer = Localizer;
-
-		if (!string.IsNullOrEmpty(Config.Discord.DiscordLogWebhook))
-			DiscordWebhookClientLog = new DiscordWebhookClient(Config.Discord.DiscordLogWebhook);
-		if (!string.IsNullOrEmpty(Config.Discord.DiscordPenaltyWebhook))
-			DiscordWebhookClientPenalty = new DiscordWebhookClient(Config.Discord.DiscordPenaltyWebhook);
-
+		
 		PluginInfo.ShowAd(ModuleVersion);
 		_ = PluginInfo.CheckVersion(ModuleVersion, _logger);
 	}

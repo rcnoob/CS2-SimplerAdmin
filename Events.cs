@@ -8,9 +8,9 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using System.Text;
 
-namespace CS2_SimpleAdmin;
+namespace CS2_SimplerAdmin;
 
-public partial class CS2_SimpleAdmin
+public partial class CS2_SimplerAdmin
 {
 	private void RegisterEvents()
 	{
@@ -111,7 +111,6 @@ public partial class CS2_SimpleAdmin
 		{
 			// Initialize managers
 			BanManager banManager = new(_database, Config);
-			MuteManager muteManager = new(_database);
 
 			try
 			{
@@ -137,51 +136,6 @@ public partial class CS2_SimpleAdmin
 					});
 
 					return;
-				}
-
-				// Check if the player is muted
-				var activeMutes = await muteManager.IsPlayerMuted(playerInfo.SteamId);
-				if (activeMutes.Count > 0)
-				{
-					foreach (var mute in activeMutes)
-					{
-						string muteType = mute.type;
-						DateTime ends = mute.ends;
-						int duration = mute.duration;
-
-						switch (muteType)
-						{
-							// Apply mute penalty based on mute type
-							case "GAG":
-								PlayerPenaltyManager.AddPenalty(playerInfo.Slot, PenaltyType.Gag, ends, duration);
-								await Server.NextFrameAsync(() =>
-								{
-									if (_tagsDetected)
-									{
-										Server.ExecuteCommand($"css_tag_mute {playerInfo.SteamId}");
-									}
-								});
-								break;
-							case "MUTE":
-								PlayerPenaltyManager.AddPenalty(playerInfo.Slot, PenaltyType.Mute, ends, duration);
-								await Server.NextFrameAsync(() =>
-								{
-									player.VoiceFlags = VoiceFlags.Muted;
-								});
-								break;
-							default:
-								PlayerPenaltyManager.AddPenalty(playerInfo.Slot, PenaltyType.Silence, ends, duration);
-								await Server.NextFrameAsync(() =>
-								{
-									player.VoiceFlags = VoiceFlags.Muted;
-									if (_tagsDetected)
-									{
-										Server.ExecuteCommand($"css_tag_mute {playerInfo.SteamId}");
-									}
-								});
-								break;
-						}
-					}
 				}
 			}
 			catch (Exception ex)
@@ -318,21 +272,6 @@ public partial class CS2_SimpleAdmin
 					_logger?.LogCritical("Unable to create or get server_id" + ex.Message);
 				}
 
-				if (Config.EnableMetrics)
-				{
-					var queryString = $"?address={address}&hostname={hostname}";
-					using HttpClient client = new();
-
-					try
-					{
-						await client.GetAsync($"https://api.daffyy.love/index.php{queryString}");
-					}
-					catch (HttpRequestException ex)
-					{
-						Logger.LogWarning($"Unable to make metrics call: {ex.Message}");
-					}
-				}
-
 				//await _adminManager.GiveAllGroupsFlags();
 				//await _adminManager.GiveAllFlags();
 
@@ -360,10 +299,8 @@ public partial class CS2_SimpleAdmin
 			{
 				PermissionManager adminManager = new(_database);
 				BanManager banManager = new(_database, Config);
-				MuteManager muteManager = new(_database);
 
 				await banManager.ExpireOldBans();
-				await muteManager.ExpireOldMutes();
 				await adminManager.DeleteOldAdmins();
 				BannedPlayers.Clear();
 				if (onlinePlayers.Count > 0)

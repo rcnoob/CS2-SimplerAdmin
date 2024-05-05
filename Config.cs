@@ -1,7 +1,7 @@
 ﻿using CounterStrikeSharp.API.Core;
 using System.Text.Json.Serialization;
 
-namespace CS2_SimpleAdmin
+namespace CS2_SimplerAdmin
 {
 	public class DurationItem
 	{
@@ -19,30 +19,6 @@ namespace CS2_SimpleAdmin
 
 		[JsonPropertyName("flag")]
 		public required string Flag { get; set; }
-	}
-
-	public class Discord
-	{
-		[JsonPropertyName("DiscordLogWebhook")]
-		public string DiscordLogWebhook { get; set; } = "";
-
-		[JsonPropertyName("DiscordPenaltyWebhook")]
-		public string DiscordPenaltyWebhook { get; set; } = "";
-	}
-
-	public class CustomServerCommandData
-	{
-		[JsonPropertyName("Flag")]
-		public string Flag { get; set; } = "@css/generic";
-
-		[JsonPropertyName("DisplayName")]
-		public string DisplayName { get; set; } = "";
-
-		[JsonPropertyName("Command")]
-		public string Command { get; set; } = "";
-
-		[JsonPropertyName("ExecuteOnClient")]
-		public bool ExecuteOnClient { get; set; } = false;
 	}
 
 	public class MenuConfig
@@ -108,7 +84,7 @@ namespace CS2_SimpleAdmin
 		];
 	}
 
-	public class CS2_SimpleAdminConfig : BasePluginConfig
+	public class CS2_SimplerAdminConfig : BasePluginConfig
 	{
 		[JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 13;
 
@@ -127,12 +103,6 @@ namespace CS2_SimpleAdmin
 		[JsonPropertyName("DatabaseName")]
 		public string DatabaseName { get; set; } = "";
 
-		[JsonPropertyName("EnableMetrics")]
-		public bool EnableMetrics { get; set; } = true;
-
-		[JsonPropertyName("UseChatMenu")]
-		public bool UseChatMenu { get; set; } = false;
-
 		[JsonPropertyName("KickTime")]
 		public int KickTime { get; set; } = 5;
 
@@ -149,23 +119,5 @@ namespace CS2_SimpleAdmin
 
 		[JsonPropertyName("ExpireOldIpBans")]
 		public int ExpireOldIpBans { get; set; } = 0;
-
-		[JsonPropertyName("TeamSwitchType")]
-		public int TeamSwitchType { get; set; } = 1;
-
-		[JsonPropertyName("Discord")]
-		public Discord Discord { get; set; } = new();
-
-		[JsonPropertyName("DefaultMaps")]
-		public List<string> DefaultMaps { get; set; } = [];
-
-		[JsonPropertyName("WorkshopMaps")]
-		public List<string> WorkshopMaps { get; set; } = [];
-
-		[JsonPropertyName("CustomServerCommands")]
-		public List<CustomServerCommandData> CustomServerCommands { get; set; } = new();
-
-		[JsonPropertyName("MenuConfig")]
-		public MenuConfig MenuConfigs { get; set; } = new();
 	}
 }

@@ -3,9 +3,9 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
 
-namespace CS2_SimpleAdmin;
+namespace CS2_SimplerAdmin;
 
-internal class BanManager(Database.Database database, CS2_SimpleAdminConfig config)
+internal class BanManager(Database.Database database, CS2_SimplerAdminConfig config)
 {
 	public async Task BanPlayer(PlayerInfo player, PlayerInfo issuer, string reason, int time = 0)
 	{
@@ -30,7 +30,7 @@ internal class BanManager(Database.Database database, CS2_SimpleAdminConfig conf
 				duration = time,
 				ends = futureTime,
 				created = now,
-				serverid = CS2_SimpleAdmin.ServerId
+				serverid = CS2_SimplerAdmin.ServerId
 			});
 		}
 		catch { }
@@ -59,7 +59,7 @@ internal class BanManager(Database.Database database, CS2_SimpleAdminConfig conf
 				duration = time,
 				ends = futureTime,
 				created = now,
-				serverid = CS2_SimpleAdmin.ServerId
+				serverid = CS2_SimplerAdmin.ServerId
 			});
 		}
 		catch { }
@@ -88,7 +88,7 @@ internal class BanManager(Database.Database database, CS2_SimpleAdminConfig conf
 				duration = time,
 				ends = futureTime,
 				created = now,
-				serverid = CS2_SimpleAdmin.ServerId
+				serverid = CS2_SimplerAdmin.ServerId
 			});
 		}
 		catch { }
@@ -102,8 +102,8 @@ internal class BanManager(Database.Database database, CS2_SimpleAdminConfig conf
 		}
 
 #if DEBUG
-		if (CS2_SimpleAdmin._logger!= null)
-			CS2_SimpleAdmin._logger.LogCritical($"IsPlayerBanned for {player.Name}");
+		if (CS2_SimplerAdmin._logger!= null)
+			CS2_SimplerAdmin._logger.LogCritical($"IsPlayerBanned for {player.Name}");
 #endif
 
 		int banCount;
@@ -145,7 +145,7 @@ internal class BanManager(Database.Database database, CS2_SimpleAdminConfig conf
 				PlayerIP = config.BanType == 0 || string.IsNullOrEmpty(player.IpAddress) ? null : player.IpAddress,
 				PlayerName = !string.IsNullOrEmpty(player.Name) ? player.Name : string.Empty,
 				CurrentTime = currentTime,
-				serverid = CS2_SimpleAdmin.ServerId
+				serverid = CS2_SimplerAdmin.ServerId
 			};
 
 			banCount = await connection.ExecuteScalarAsync<int>(sql, parameters);
@@ -179,7 +179,7 @@ internal class BanManager(Database.Database database, CS2_SimpleAdminConfig conf
 					{
 						PlayerSteamID = player.SteamId,
 						PlayerIP = player.IpAddress,
-						serverid = CS2_SimpleAdmin.ServerId
+						serverid = CS2_SimplerAdmin.ServerId
 					});
 			}
 			else
@@ -189,7 +189,7 @@ internal class BanManager(Database.Database database, CS2_SimpleAdminConfig conf
 					{
 						PlayerSteamID = player.SteamId,
 						PlayerIP = DBNull.Value,
-						serverid = CS2_SimpleAdmin.ServerId
+						serverid = CS2_SimplerAdmin.ServerId
 					});
 			}
 
@@ -220,7 +220,7 @@ internal class BanManager(Database.Database database, CS2_SimpleAdminConfig conf
 			{
 				sqlRetrieveBans = "SELECT id FROM sa_bans WHERE (player_steamid = @pattern OR player_name = @pattern OR player_ip = @pattern) AND status = 'ACTIVE'";
 			}
-			var bans = await connection.QueryAsync(sqlRetrieveBans, new { pattern = playerPattern, serverid = CS2_SimpleAdmin.ServerId });
+			var bans = await connection.QueryAsync(sqlRetrieveBans, new { pattern = playerPattern, serverid = CS2_SimplerAdmin.ServerId });
 
 			var bansList = bans as dynamic[] ?? bans.ToArray();
 			if (bansList.Length == 0)
@@ -288,12 +288,12 @@ internal class BanManager(Database.Database database, CS2_SimpleAdminConfig conf
 				if (checkIpBans && !string.IsNullOrEmpty(IpAddress))
 				{
 					banCount = await connection.ExecuteScalarAsync<int>(sql,
-						new { PlayerSteamID = SteamID, PlayerIP = IpAddress, serverid = CS2_SimpleAdmin.ServerId });
+						new { PlayerSteamID = SteamID, PlayerIP = IpAddress, serverid = CS2_SimplerAdmin.ServerId });
 				}
 				else
 				{
 					banCount = await connection.ExecuteScalarAsync<int>(sql,
-						new { PlayerSteamID = SteamID, PlayerIP = DBNull.Value, serverid = CS2_SimpleAdmin.ServerId });
+						new { PlayerSteamID = SteamID, PlayerIP = DBNull.Value, serverid = CS2_SimplerAdmin.ServerId });
 				}
 
 				if (banCount > 0)
@@ -350,7 +350,7 @@ internal class BanManager(Database.Database database, CS2_SimpleAdminConfig conf
 			                                      					ends <= @currentTime
 			                                      """;
 
-			await connection.ExecuteAsync(sql, new { currentTime, serverid = CS2_SimpleAdmin.ServerId });
+			await connection.ExecuteAsync(sql, new { currentTime, serverid = CS2_SimplerAdmin.ServerId });
 
 			if (config.ExpireOldIpBans > 0)
 			{
@@ -376,12 +376,12 @@ internal class BanManager(Database.Database database, CS2_SimpleAdminConfig conf
 				                                      					ends <= @ipBansTime
 				                                      """;
 
-				await connection.ExecuteAsync(sql, new { ipBansTime, CS2_SimpleAdmin.ServerId });
+				await connection.ExecuteAsync(sql, new { ipBansTime, CS2_SimplerAdmin.ServerId });
 			}
 		}
 		catch (Exception)
 		{
-			CS2_SimpleAdmin._logger?.LogCritical("Unable to remove expired bans");
+			CS2_SimplerAdmin._logger?.LogCritical("Unable to remove expired bans");
 		}
 	}
 }

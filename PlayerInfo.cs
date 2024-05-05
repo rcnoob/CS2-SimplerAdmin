@@ -1,4 +1,4 @@
-﻿namespace CS2_SimpleAdmin
+﻿namespace CS2_SimplerAdmin
 {
 	public class PlayerInfo
 	{

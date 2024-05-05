@@ -6,56 +6,11 @@ using MySqlConnector;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 
-namespace CS2_SimpleAdmin;
+namespace CS2_SimplerAdmin;
 
 public class PermissionManager(Database.Database database)
 {
-	// Unused for now
-	//public static readonly ConcurrentDictionary<string, ConcurrentBag<string>> _adminCache = new ConcurrentDictionary<string, ConcurrentBag<string>>();
 	public static readonly ConcurrentDictionary<SteamID, DateTime?> AdminCache = new();
-
-	/*
-	public async Task<List<(List<string>, int)>> GetAdminFlags(string steamId)
-	{
-		DateTime now = DateTime.UtcNow.ToLocalTime();
-
-		await using MySqlConnection connection = await _database.GetConnectionAsync();
-
-		string sql = "SELECT flags, immunity, ends FROM sa_admins WHERE player_steamid = @PlayerSteamID AND (ends IS NULL OR ends > @CurrentTime) AND (server_id IS NULL OR server_id = @serverid)";
-		List<dynamic>? activeFlags = (await connection.QueryAsync(sql, new { PlayerSteamID = steamId, CurrentTime = now, serverid = CS2_SimpleAdmin.ServerId }))?.ToList();
-
-		if (activeFlags == null)
-		{
-			return new List<(List<string>, int)>();
-		}
-
-		List<(List<string>, int)> filteredFlagsWithImmunity = [];
-
-		foreach (dynamic flags in activeFlags)
-		{
-			if (flags is not IDictionary<string, object> flagsDict)
-			{
-				continue;
-			}
-
-			if (!flagsDict.TryGetValue("flags", out var flagsValueObj) || !flagsDict.TryGetValue("immunity", out var immunityValueObj))
-			{
-				continue;
-			}
-
-			if (!(flagsValueObj is string flagsValue) || !int.TryParse(immunityValueObj.ToString(), out var immunityValue))
-			{
-				continue;
-			}
-
-			//Console.WriteLine($"Flags: {flagsValue}, Immunity: {immunityValue}");
-
-			filteredFlagsWithImmunity.Add((flagsValue.Split(',').ToList(), immunityValue));
-		}
-
-		return filteredFlagsWithImmunity;
-	}
-	*/
 
 	private async Task<List<(string, string, List<string>, int, DateTime?)>> GetAllPlayersFlags()
 	{
@@ -74,7 +29,7 @@ public class PermissionManager(Database.Database database)
 			                               ORDER BY sa_admins.player_steamid
 			                   """;
 
-			var activeFlags = (await connection.QueryAsync(sql, new { CurrentTime = now, serverid = CS2_SimpleAdmin.ServerId })).ToList();
+			var activeFlags = (await connection.QueryAsync(sql, new { CurrentTime = now, serverid = CS2_SimplerAdmin.ServerId })).ToList();
 
 			List<(string, string, List<string>, int, DateTime?)> filteredFlagsWithImmunity = [];
 			var currentSteamId = string.Empty;
@@ -139,79 +94,13 @@ public class PermissionManager(Database.Database database)
 			return [];
 		}
 	}
-
-	/*
-	public async Task<Dictionary<int, Tuple<List<string>, List<Tuple<string, DateTime?>>, int>>> GetAllGroupsFlags()
-	{
-		try
-		{
-			await using MySqlConnection connection = await _database.GetConnectionAsync();
-
-			string sql = "SELECT group_id FROM sa_groups_servers WHERE server_id = @serverid";
-			var groupIds = connection.Query<int>(sql, new { serverid = CS2_SimpleAdmin.ServerId }).ToList();
-
-			sql = @"
-            SELECT g.group_id, f.flag 
-            FROM sa_groups_flags f
-            JOIN sa_groups_servers g ON f.group_id = g.group_id
-            WHERE g.server_id = @serverid";
-
-			var groupFlagData = connection.Query(sql, new { serverid = CS2_SimpleAdmin.ServerId }).ToList();
-
-			if (groupIds.Count == 0 || groupFlagData.Count == 0)
-			{
-				return [];
-			}
-
-			var groupInfoDictionary = new Dictionary<int, Tuple<List<string>, List<Tuple<string, DateTime?>>, int>>();
-
-			foreach (var groupId in groupIds)
-			{
-				groupInfoDictionary[groupId] = new Tuple<List<string>, List<Tuple<string, DateTime?>>, int>([], [], 0);
-			}
-
-			foreach (var row in groupFlagData)
-			{
-				var groupId = (int)row.group_id;
-				var flag = (string)row.flag;
-
-				groupInfoDictionary[groupId].Item1.Add(flag);
-			}
-
-			sql = @"
-            SELECT a.group_id, a.player_steamid, a.ends, g.immunity, g.name  
-            FROM sa_admins a
-            JOIN sa_groups g ON a.group_id = g.id
-            WHERE a.group_id IN @groupIds";
-
-			var playerData = (await connection.QueryAsync(sql, new { groupIds })).ToList();
-
-			foreach (var row in playerData)
-			{
-				var groupId = (int)row.group_id;
-				var playerSteamid = (string)row.player_steamid;
-				var ends = row.ends as DateTime?;
-				var immunity = (int)row.immunity;
-
-				groupInfoDictionary[groupId].Item2.Add(new Tuple<string, DateTime?>(playerSteamid, ends));
-				groupInfoDictionary[groupId] = new Tuple<List<string>, List<Tuple<string, DateTime?>>, int>(groupInfoDictionary[groupId].Item1, groupInfoDictionary[groupId].Item2, immunity);
-			}
-
-			return groupInfoDictionary;
-		}
-		catch { }
-
-		return [];
-	}
-	*/
-
 	private async Task<Dictionary<string, (List<string>, int)>> GetAllGroupsData()
 	{
 		await using MySqlConnection connection = await database.GetConnectionAsync();
 		try
 		{
 			var sql = "SELECT group_id FROM sa_groups_servers WHERE (server_id = @serverid OR server_id IS NULL)";
-			var groupDataSql = connection.Query<int>(sql, new { serverid = CS2_SimpleAdmin.ServerId }).ToList();
+			var groupDataSql = connection.Query<int>(sql, new { serverid = CS2_SimplerAdmin.ServerId }).ToList();
 
 			sql = """
 			      				SELECT g.group_id, sg.name AS group_name, sg.immunity, f.flag
@@ -221,7 +110,7 @@ public class PermissionManager(Database.Database database)
 			      				WHERE (g.server_id = @serverid OR server_id IS NULL)
 			      """;
 
-			var groupData = connection.Query(sql, new { serverid = CS2_SimpleAdmin.ServerId }).ToList();
+			var groupData = connection.Query(sql, new { serverid = CS2_SimplerAdmin.ServerId }).ToList();
 
 			if (groupDataSql.Count == 0 || groupData.Count == 0)
 			{
@@ -272,69 +161,8 @@ public class PermissionManager(Database.Database database)
 		}
 
 		var json = JsonConvert.SerializeObject(jsonStructure, Formatting.Indented);
-		await File.WriteAllTextAsync(CS2_SimpleAdmin.Instance.ModuleDirectory + "/data/groups.json", json);
+		await File.WriteAllTextAsync(CS2_SimplerAdmin.Instance.ModuleDirectory + "/data/groups.json", json);
 	}
-
-	/*
-	public async Task GiveAllGroupsFlags()
-	{
-		Dictionary<int, Tuple<List<string>, List<Tuple<string, DateTime?>>, int>> groupFlags = await GetAllGroupsFlags();
-
-		foreach (var kvp in groupFlags)
-		{
-			var flags = kvp.Value.Item1;
-			var players = kvp.Value.Item2;
-			int immunity = kvp.Value.Item3;
-
-			foreach (var playerTuple in players)
-			{
-				var steamIdStr = playerTuple.Item1;
-				var ends = playerTuple.Item2;
-
-				if (!string.IsNullOrEmpty(steamIdStr) && SteamID.TryParse(steamIdStr, out var steamId) && steamId != null)
-				{
-					if (!_adminCache.ContainsKey(steamId))
-					{
-						_adminCache.TryAdd(steamId, ends);
-					}
-
-					Helper.GivePlayerFlags(steamId, flags, (uint)immunity);
-					// Often need to call 2 times
-					Helper.GivePlayerFlags(steamId, flags, (uint)immunity);
-				}
-			}
-		}
-	}
-	*/
-	/*
-	public async Task GiveAllFlags()
-	{
-		List<(string, string, List<string>, int, DateTime?)> allPlayers = await GetAllPlayersFlags();
-
-		foreach (var record in allPlayers)
-		{
-			string steamIdStr = record.Item1;
-			List<string> flags = record.Item2;
-			int immunity = record.Item3;
-
-			DateTime? ends = record.Item4;
-
-			if (!string.IsNullOrEmpty(steamIdStr) && SteamID.TryParse(steamIdStr, out var steamId) && steamId != null)
-			{
-				if (!_adminCache.ContainsKey(steamId))
-				{
-					_adminCache.TryAdd(steamId, ends);
-					//_adminCacheTimestamps.Add(steamId, ends);
-				}
-
-				Helper.GivePlayerFlags(steamId, flags, (uint)immunity);
-				// Often need to call 2 times
-				Helper.GivePlayerFlags(steamId, flags, (uint)immunity);
-			}
-		}
-	}
-	*/
-
 	public async Task CreateAdminsJsonFile()
 	{
 		List<(string identity, string name, List<string> flags, int immunity, DateTime? ends)> allPlayers = await GetAllPlayersFlags();
@@ -369,14 +197,12 @@ public class PermissionManager(Database.Database database)
 			.ToDictionary(item => item.playerName, item => item.playerData);
 
 		var json = JsonConvert.SerializeObject(jsonData, Formatting.Indented);
-		await File.WriteAllTextAsync(CS2_SimpleAdmin.Instance.ModuleDirectory + "/data/admins.json", json);
+		await File.WriteAllTextAsync(CS2_SimplerAdmin.Instance.ModuleDirectory + "/data/admins.json", json);
 	}
 
 	public async Task DeleteAdminBySteamId(string playerSteamId, bool globalDelete = false)
 	{
 		if (string.IsNullOrEmpty(playerSteamId)) return;
-
-		//_adminCache.TryRemove(playerSteamId, out _);
 
 		try
 		{
@@ -386,7 +212,7 @@ public class PermissionManager(Database.Database database)
 				? "DELETE FROM sa_admins WHERE player_steamid = @PlayerSteamID"
 				: "DELETE FROM sa_admins WHERE player_steamid = @PlayerSteamID AND server_id = @ServerId";
 
-			await connection.ExecuteAsync(sql, new { PlayerSteamID = playerSteamId, CS2_SimpleAdmin.ServerId });
+			await connection.ExecuteAsync(sql, new { PlayerSteamID = playerSteamId, CS2_SimplerAdmin.ServerId });
 		}
 		catch { };
 	}
@@ -418,7 +244,7 @@ public class PermissionManager(Database.Database database)
 				immunity,
 				ends = futureTime,
 				created = now,
-				serverid = globalAdmin ? null : CS2_SimpleAdmin.ServerId
+				serverid = globalAdmin ? null : CS2_SimplerAdmin.ServerId
 			});
 
 			// Insert flags into sa_admins_flags table
@@ -452,7 +278,7 @@ public class PermissionManager(Database.Database database)
 
 			await Server.NextFrameAsync(() =>
 			{
-				CS2_SimpleAdmin.Instance.ReloadAdmins(null);
+				CS2_SimplerAdmin.Instance.ReloadAdmins(null);
 			});
 		}
 		catch (Exception ex)
@@ -493,11 +319,11 @@ public class PermissionManager(Database.Database database)
 			const string insertGroupServer = "INSERT INTO `sa_groups_servers` (`group_id`, `server_id`) " +
 											 "VALUES (@groupId, @server_id)";
 
-			await connection.ExecuteAsync(insertGroupServer, new { groupId, server_id = globalGroup ? null : CS2_SimpleAdmin.ServerId });
+			await connection.ExecuteAsync(insertGroupServer, new { groupId, server_id = globalGroup ? null : CS2_SimplerAdmin.ServerId });
 
 			await Server.NextFrameAsync(() =>
 			{
-				CS2_SimpleAdmin.Instance.ReloadAdmins(null);
+				CS2_SimplerAdmin.Instance.ReloadAdmins(null);
 			});
 
 		}
@@ -534,7 +360,7 @@ public class PermissionManager(Database.Database database)
 		}
 		catch (Exception)
 		{
-			CS2_SimpleAdmin._logger?.LogCritical("Unable to remove expired admins");
+			CS2_SimplerAdmin._logger?.LogCritical("Unable to remove expired admins");
 		}
 	}
 }

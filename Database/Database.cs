@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MySqlConnector;
 
-namespace CS2_SimpleAdmin.Database;
+namespace CS2_SimplerAdmin.Database;
 
 public class Database(string dbConnectionString)
 {
@@ -15,8 +15,8 @@ public class Database(string dbConnectionString)
 		}
 		catch (Exception ex)
 		{
-			if (CS2_SimpleAdmin._logger != null)
-				CS2_SimpleAdmin._logger.LogCritical($"Unable to connect to database: {ex.Message}");
+			if (CS2_SimplerAdmin._logger != null)
+				CS2_SimplerAdmin._logger.LogCritical($"Unable to connect to database: {ex.Message}");
 			throw;
 		}
 	}
@@ -31,7 +31,7 @@ public class Database(string dbConnectionString)
 		}
 		catch (Exception ex)
 		{
-			CS2_SimpleAdmin._logger?.LogCritical($"Unable to connect to database: {ex.Message}");
+			CS2_SimplerAdmin._logger?.LogCritical($"Unable to connect to database: {ex.Message}");
 			throw;
 		}
 	}

@@ -5,9 +5,6 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Memory;
-using CounterStrikeSharp.API.Modules.Menu;
-using Discord;
-using Discord.Webhook;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
@@ -16,14 +13,14 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace CS2_SimpleAdmin
+namespace CS2_SimplerAdmin
 {
 	internal class Helper
 	{
 		private static readonly string AssemblyName = Assembly.GetExecutingAssembly().GetName().Name ?? "";
 		private static readonly string CfgPath = $"{Server.GameDirectory}/csgo/addons/counterstrikesharp/configs/plugins/{AssemblyName}/{AssemblyName}.json";
 
-		internal static CS2_SimpleAdminConfig? Config { get; set; }
+		internal static CS2_SimplerAdminConfig? Config { get; set; }
 
 		public static bool IsDebugBuild
 		{
@@ -136,83 +133,6 @@ namespace CS2_SimpleAdmin
 			});
 		}
 
-		internal static void HandleVotes(CCSPlayerController player, ChatMenuOption option)
-		{
-			if (!CS2_SimpleAdmin.VoteInProgress)
-				return;
-
-			option.Disabled = true;
-			CS2_SimpleAdmin.VoteAnswers[option.Text]++;
-		}
-
-		internal static void LogCommand(CCSPlayerController? caller, CommandInfo command)
-		{
-			if (CS2_SimpleAdmin._localizer == null)
-				return;
-
-			var playerName = caller?.PlayerName ?? "Console";
-
-			var hostname = ConVar.Find("hostname")?.StringValue ?? CS2_SimpleAdmin._localizer["sa_unknown"];
-
-			CS2_SimpleAdmin.Instance.Logger.LogInformation($"{CS2_SimpleAdmin._localizer[
-				"sa_discord_log_command",
-				playerName, command.GetCommandString]}".Replace("HOSTNAME", hostname).Replace("**", ""));
-		}
-
-		internal static void LogCommand(CCSPlayerController? caller, string command)
-		{
-			if (CS2_SimpleAdmin._localizer == null)
-				return;
-
-			var playerName = caller?.PlayerName ?? "Console";
-
-			var hostname = ConVar.Find("hostname")?.StringValue ?? CS2_SimpleAdmin._localizer["sa_unknown"];
-
-			CS2_SimpleAdmin.Instance.Logger.LogInformation($"{CS2_SimpleAdmin._localizer["sa_discord_log_command",
-				playerName, command]}".Replace("HOSTNAME", hostname).Replace("**", ""));
-		}
-
-		public static IEnumerable<Embed> GenerateEmbedsDiscord(string title, string description, string thumbnailUrl, Color color, string[] fieldNames, string[] fieldValues, bool[] inlineFlags)
-		{
-			var hostname = ConVar.Find("hostname")?.StringValue ?? CS2_SimpleAdmin._localizer?["sa_unknown"] ?? "Unknown";
-			var address = $"{ConVar.Find("ip")?.StringValue}:{ConVar.Find("hostport")!.GetPrimitiveValue<int>()}";
-
-			description = description.Replace("{hostname}", hostname);
-			description = description.Replace("{address}", address);
-
-			var embed = new EmbedBuilder
-			{
-				Title = title,
-				Description = description,
-				ThumbnailUrl = thumbnailUrl,
-				Color = color,
-			};
-
-			for (var i = 0; i < fieldNames.Length; i++)
-			{
-				fieldValues[i] = fieldValues[i].Replace("{hostname}", hostname ?? CS2_SimpleAdmin._localizer?["sa_unknown"] ?? "Unknown");
-				fieldValues[i] = fieldValues[i].Replace("{address}", address ?? CS2_SimpleAdmin._localizer?["sa_unknown"] ?? "Unknown");
-
-				embed.AddField(fieldNames[i], fieldValues[i], inlineFlags[i]);
-
-				if ((i + 1) % 2 == 0 && i < fieldNames.Length - 1)
-				{
-					embed.AddField("\u200b", "\u200b");
-				}
-			}
-
-			return new List<Embed> { embed.Build() };
-		}
-
-		public static void SendDiscordLogMessage(CCSPlayerController? caller, CommandInfo command, DiscordWebhookClient? discordWebhookClientLog, IStringLocalizer? localizer)
-		{
-			if (discordWebhookClientLog == null || localizer == null) return;
-			
-			var communityUrl = caller != null ? "<" + new SteamID(caller.SteamID).ToCommunityUrl() + ">" : "<https://steamcommunity.com/profiles/0>";
-			var callerName = caller != null ? caller.PlayerName : "Console";
-			discordWebhookClientLog.SendMessageAsync(Helper.GenerateMessageDiscord(localizer["sa_discord_log_command", $"[{callerName}]({communityUrl})", command.GetCommandString]));
-		}
-
 		public enum PenaltyType
 		{
 			Ban,
@@ -226,73 +146,6 @@ namespace CS2_SimpleAdmin
 			var time = TimeSpan.FromMinutes(minutes);
 
 			return time.Days > 0 ? $"{time.Days}d {time.Hours}h {time.Minutes}m" : time.Hours > 0 ? $"{time.Hours}h {time.Minutes}m" : $"{time.Minutes}m";
-		}
-
-		public static void SendDiscordPenaltyMessage(CCSPlayerController? caller, CCSPlayerController? target, string reason, int duration, PenaltyType penalty, DiscordWebhookClient? discordWebhookClientPenalty, IStringLocalizer? localizer)
-		{
-			if (discordWebhookClientPenalty == null || localizer == null) return;
-			
-			var callerCommunityUrl = caller != null ? "<" + new SteamID(caller.SteamID).ToCommunityUrl() + ">" : "<https://steamcommunity.com/profiles/0>";
-			var targetCommunityUrl = target != null ? "<" + new SteamID(target.SteamID).ToCommunityUrl() + ">" : "<https://steamcommunity.com/profiles/0>";
-			var callerName = caller != null ? caller.PlayerName : "Console";
-			var targetName = target != null ? target.PlayerName : localizer["sa_unknown"];
-			var targetSteamId = target != null ? new SteamID(target.SteamID).SteamId2 : localizer["sa_unknown"];
-
-			var time = duration != 0 ? ConvertMinutesToTime(duration) : localizer["sa_permanent"];
-
-			string[] fieldNames = [
-				localizer["sa_player"],
-				localizer["sa_steamid"],
-				localizer["sa_duration"],
-				localizer["sa_reason"],
-				localizer["sa_admin"]];
-			string[] fieldValues = [$"[{targetName}]({targetCommunityUrl})", targetSteamId, time, reason, $"[{callerName}]({callerCommunityUrl})"];
-			bool[] inlineFlags = [true, true, true, false, false];
-
-			var hostname = ConVar.Find("hostname")?.StringValue ?? localizer["sa_unknown"];
-
-			var embed = new EmbedBuilder
-			{
-				Title = penalty switch
-				{
-					PenaltyType.Ban => localizer["sa_discord_penalty_ban"],
-					PenaltyType.Mute => localizer["sa_discord_penalty_mute"],
-					PenaltyType.Gag => localizer["sa_discord_penalty_gag"],
-					PenaltyType.Silence => localizer["sa_discord_penalty_silence"],
-					_ => localizer["sa_discord_penalty_unknown"],
-				},
-
-				Color = penalty switch
-				{
-					PenaltyType.Ban => Color.Red,
-					PenaltyType.Mute => Color.Blue,
-					PenaltyType.Gag => Color.Gold,
-					PenaltyType.Silence => Color.Green,
-					_ => Color.Default,
-				},
-
-				Description = $"{hostname}",
-
-				Timestamp = DateTimeOffset.UtcNow
-			};
-
-			for (var i = 0; i < fieldNames.Length; i++)
-			{
-				embed.AddField(fieldNames[i], fieldValues[i], inlineFlags[i]);
-			}
-
-			discordWebhookClientPenalty.SendMessageAsync(embeds: [embed.Build()]);
-		}
-
-		private static string GenerateMessageDiscord(string message)
-		{
-			var hostname = ConVar.Find("hostname")?.StringValue ?? CS2_SimpleAdmin._localizer?["sa_unknown"] ?? "Unknown";
-			var address = $"{ConVar.Find("ip")?.StringValue}:{ConVar.Find("hostport")!.GetPrimitiveValue<int>()}";
-
-			message = message.Replace("HOSTNAME", hostname);
-			message = message.Replace("ADDRESS", address);
-
-			return message;
 		}
 
 		public static void UpdateConfig<T>(T config) where T : BasePluginConfig, new()
@@ -316,23 +169,6 @@ namespace CS2_SimpleAdmin
 				});
 			File.WriteAllText(CfgPath, updatedJsonContent);
 		}
-
-		public static void TryLogCommandOnDiscord(CCSPlayerController? caller, string commandString)
-		{
-			if (CS2_SimpleAdmin.DiscordWebhookClientLog == null || CS2_SimpleAdmin._localizer == null)
-				return;
-
-			if (caller != null && caller.IsValid == false)
-				caller = null;
-
-			var callerName = caller == null ? "Console" : caller.PlayerName;
-			var communityUrl = caller != null
-				? "<" + new SteamID(caller.SteamID).ToCommunityUrl() + ">"
-				: "<https://steamcommunity.com/profiles/0>";
-			CS2_SimpleAdmin.DiscordWebhookClientLog.SendMessageAsync(GenerateMessageDiscord(
-				CS2_SimpleAdmin._localizer["sa_discord_log_command", $"[{callerName}]({communityUrl})",
-					commandString]));
-		}
 	}
 
 	public static class PluginInfo
@@ -343,7 +179,7 @@ namespace CS2_SimpleAdmin
 
 			try
 			{
-				var response = await client.GetAsync("https://raw.githubusercontent.com/daffyyyy/CS2-SimpleAdmin/main/VERSION").ConfigureAwait(false);
+				var response = await client.GetAsync("https://raw.githubusercontent.com/rcnoob/CS2-SimplerAdmin/main/VERSION").ConfigureAwait(false);
 
 				if (response.IsSuccessStatusCode)
 				{
@@ -355,7 +191,7 @@ namespace CS2_SimpleAdmin
 					switch (comparisonResult)
 					{
 						case < 0:
-							logger.LogWarning("Plugin is outdated! Check https://github.com/daffyyyy/CS2-SimpleAdmin");
+							logger.LogWarning("Plugin is outdated! Check https://github.com/rcnoob/CS2-SimplerAdmin");
 							break;
 						case > 0:
 							logger.LogInformation("Probably dev version detected");
@@ -391,7 +227,7 @@ namespace CS2_SimpleAdmin
 			Console.WriteLine(" _____| ||   | | ||_|| ||   |    |       ||   |___ |   _   ||       || ||_|| ||   | | | |   |");
 			Console.WriteLine("|_______||___| |_|   |_||___|    |_______||_______||__| |__||______| |_|   |_||___| |_|  |__|");
 			Console.WriteLine("				>> Version: " + moduleVersion);
-			Console.WriteLine("		>> GitHub: https://github.com/daffyyyy/CS2-SimpleAdmin");
+			Console.WriteLine("		>> GitHub: https://github.com/rcnoob/CS2-SimplerAdmin");
 			Console.WriteLine(" ");
 		}
 	}

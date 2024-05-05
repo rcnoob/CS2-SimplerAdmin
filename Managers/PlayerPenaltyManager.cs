@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace CS2_SimpleAdmin;
+namespace CS2_SimplerAdmin;
 
 public enum PenaltyType
 {
