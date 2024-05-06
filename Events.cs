@@ -291,8 +291,8 @@ public partial class CS2_SimplerAdmin
 
 			var players = Helper.GetValidPlayers();
 			var onlinePlayers = players
-				.Where(player => player.IpAddress != null && player.SteamID.ToString().Length == 17)
-				.Select(player => (player.IpAddress, player.SteamID, player.UserId))
+				.Where(player => player.IpAddress != null)
+				.Select(player => (player.IpAddress, player.SteamID, player.UserId, player.Slot))
 				.ToList();
 
 			Task.Run(async () =>

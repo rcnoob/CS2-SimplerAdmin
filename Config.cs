@@ -86,7 +86,7 @@ namespace CS2_SimplerAdmin
 
 	public class CS2_SimplerAdminConfig : BasePluginConfig
 	{
-		[JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 13;
+		[JsonPropertyName("ConfigVersion")] public override int Version { get; set; } = 14;
 
 		[JsonPropertyName("DatabaseHost")]
 		public string DatabaseHost { get; set; } = "";
@@ -111,6 +111,9 @@ namespace CS2_SimplerAdmin
 		
 		[JsonPropertyName("BanType")]
 		public int BanType { get; set; } = 1;
+
+		[JsonPropertyName("TimeMode")]
+		public int TimeMode { get; set; } = 1;
 		
 		[JsonPropertyName("MaxBanDuration")]
 		public int MaxBanDuration { get; set; } = 60 * 24 * 7; // 7 days

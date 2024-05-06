@@ -10,7 +10,7 @@ using System.Collections.Concurrent;
 
 namespace CS2_SimplerAdmin;
 
-[MinimumApiVersion(220)]
+[MinimumApiVersion(225)]
 public partial class CS2_SimplerAdmin : BasePlugin, IPluginConfig<CS2_SimplerAdminConfig>
 {
 	public static CS2_SimplerAdmin Instance { get; private set; } = new();
@@ -32,7 +32,7 @@ public partial class CS2_SimplerAdmin : BasePlugin, IPluginConfig<CS2_SimplerAdm
 	public override string ModuleName => "CS2-SimplerAdmin";
 	public override string ModuleDescription => "A de-bloated build of CS2-SimpleAdmin";
 	public override string ModuleAuthor => "rc";
-	public override string ModuleVersion => "1.0.0";
+	public override string ModuleVersion => "1.0.1";
 
 	public CS2_SimplerAdminConfig Config { get; set; } = new();
 
