@@ -17,7 +17,7 @@ A de-bloated build of CS2-SimpleAdmin
 ```
 
 ### Requirements
-- [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp/) **tested on v201**
+- [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp/) **tested on v225**
 - MySQL **tested on MySQL (MariaDB) Server version: 10.11.4-MariaDB-1~deb12u1 Debian 12**
 
 
