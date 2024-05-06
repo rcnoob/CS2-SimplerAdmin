@@ -111,9 +111,6 @@ namespace CS2_SimplerAdmin
 		
 		[JsonPropertyName("BanType")]
 		public int BanType { get; set; } = 1;
-
-		[JsonPropertyName("TimeMode")]
-		public int TimeMode { get; set; } = 1;
 		
 		[JsonPropertyName("MaxBanDuration")]
 		public int MaxBanDuration { get; set; } = 60 * 24 * 7; // 7 days

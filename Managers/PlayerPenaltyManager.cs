@@ -46,8 +46,6 @@ public class PlayerPenaltyManager
 		if (!Penalties.TryGetValue(slot, out var penaltyDict) ||
 			!penaltyDict.TryGetValue(penaltyType, out var penaltiesList)) return false;
 		//Console.WriteLine($"Found penalties for player with slot {slot} and penalty type {penaltyType}");
-	    if (CS2_SimplerAdmin.Instance.Config.TimeMode == 0)
-			return penaltiesList.Count != 0;
 
 		var now = DateTime.UtcNow.ToLocalTime();
 
@@ -147,26 +145,6 @@ public class PlayerPenaltyManager
 	// Remove all expired penalties for all players and penalty types
 	public static void RemoveExpiredPenalties()
 	{
-		if (CS2_SimplerAdmin.Instance.Config.TimeMode == 0)
-		{
-			foreach (var (playerSlot, penaltyDict) in Penalties.ToList()) // Use ToList to avoid modification while iterating
-			{
-				// Remove expired penalties for the player
-				foreach (var penaltiesList in penaltyDict.Values)
-				{
-					penaltiesList.RemoveAll(p => p is { Duration: > 0, Passed: true });
-				}
-
-				// Remove player slot if no penalties left
-				if (penaltyDict.Count == 0)
-				{
-					Penalties.TryRemove(playerSlot, out _);
-				}
-			}
-
-			return;
-		}
-
 		var now = DateTime.UtcNow.ToLocalTime();
 		foreach (var (playerSlot, penaltyDict) in Penalties.ToList()) // Use ToList to avoid modification while iterating
 		{
