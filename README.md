@@ -7,6 +7,7 @@ A de-bloated build of CS2-SimpleAdmin
 ```js
 - css_addadmin <steamid> <name> <flags/groups> <immunity> [time in minutes] - Add admin by steamid // @css/root
 - css_deladmin <steamid> - Delete admin by steamid // @css/root
+- css_reloadadmins - Reload sql admins // @css/root
 - css_ban <#userid or name> [time in minutes/0 perm] [reason] - Ban player // @css/ban
 - css_addban <steamid> [time in minutes/0 perm] [reason] - Ban player via steamid64 // @css/ban
 - css_banip <ip> [time in minutes/0 perm] [reason] - Ban player via IP address // @css/ban
@@ -17,7 +18,7 @@ A de-bloated build of CS2-SimpleAdmin
 ```
 
 ### Requirements
-- [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp/) **tested on v225**
+- [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp/) **tested on v228**
 - MySQL **tested on MySQL (MariaDB) Server version: 10.11.4-MariaDB-1~deb12u1 Debian 12**
 
 
