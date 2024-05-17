@@ -175,11 +175,8 @@ namespace CS2_SimplerAdmin
 
 				await Server.NextFrameAsync(() =>
 				{
-					AddTimer(0.2f, () =>
-					{
-						AdminManager.LoadAdminData(ModuleDirectory + "/data/admins.json");
-						AdminManager.LoadAdminGroups(ModuleDirectory + "/data/groups.json");
-					});
+					AdminManager.LoadAdminData(ModuleDirectory + "/data/admins.json");
+					AddTimer(1.0f, () => AdminManager.LoadAdminGroups(ModuleDirectory + "/data/groups.json"));
 				});
 			});
 
