@@ -160,8 +160,10 @@ public partial class CS2_SimplerAdmin
 
 	public HookResult OnCommandSay(CCSPlayerController? player, CommandInfo info)
 	{
-		if (player is null || !player.IsValid || player.IsBot || player.IsHLTV || info.GetArg(1).StartsWith($"/")
-			 || info.GetArg(1).StartsWith($"!") && info.GetArg(1).Length >= 12)
+		if (player is null || !player.IsValid || player.IsBot || player.IsHLTV)
+			return HookResult.Continue;
+
+		if (info.GetArg(1).StartsWith($"/") || info.GetArg(1).StartsWith($"!"))
 			return HookResult.Continue;
 
 		if (info.GetArg(1).Length == 0)
@@ -175,8 +177,10 @@ public partial class CS2_SimplerAdmin
 
 	public HookResult OnCommandTeamSay(CCSPlayerController? player, CommandInfo info)
 	{
-		if (player is null || !player.IsValid || player.IsBot || player.IsHLTV || info.GetArg(1).StartsWith($"/")
-			 || info.GetArg(1).StartsWith($"!") && info.GetArg(1).Length >= 12)
+		if (player is null || !player.IsValid || player.IsBot || player.IsHLTV )
+			return HookResult.Continue;
+
+		if (info.GetArg(1).StartsWith($"/") || info.GetArg(1).StartsWith($"!"))
 			return HookResult.Continue;
 
 		if (info.GetArg(1).Length == 0)
@@ -212,6 +216,9 @@ public partial class CS2_SimplerAdmin
 
 	public void OnMapStart(string mapName)
 	{
+		if (Config.ReloadAdminsEveryMapChange)
+			AddTimer(3.0f, () => ReloadAdmins(null));
+		
 		var path = Path.GetDirectoryName(ModuleDirectory);
 		if (Directory.Exists(path + "/CS2-Tags"))
 		{

@@ -73,6 +73,21 @@ namespace CS2_SimplerAdmin
 			return Regex.IsMatch(input, pattern);
 		}
 
+		public static bool ValidateSteamId(string input, out SteamID? steamId)
+		{
+			steamId = null;
+
+			if (string.IsNullOrEmpty(input))
+			{
+				return false;
+			}
+
+			if (!SteamID.TryParse(input, out var parsedSteamId)) return false;
+
+			steamId = parsedSteamId;
+			return true;
+		}
+
 		public static bool IsValidIp(string input)
 		{
 			const string pattern = @"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";

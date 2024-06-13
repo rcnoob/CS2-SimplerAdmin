@@ -32,7 +32,7 @@ public partial class CS2_SimplerAdmin : BasePlugin, IPluginConfig<CS2_SimplerAdm
 	public override string ModuleName => "CS2-SimplerAdmin";
 	public override string ModuleDescription => "A de-bloated build of CS2-SimpleAdmin";
 	public override string ModuleAuthor => "rc";
-	public override string ModuleVersion => "1.0.3";
+	public override string ModuleVersion => "1.0.4";
 
 	public CS2_SimplerAdminConfig Config { get; set; } = new();
 

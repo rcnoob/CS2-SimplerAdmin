@@ -12,11 +12,11 @@ public static class PlayerExtensions
 {
 	public static bool CanTarget(this CCSPlayerController? controller, CCSPlayerController? target)
 	{
-		if (target != null && target.IsBot) return true;
-		if (controller is null) return true;
+		if (controller is null || target is null) return true;
+		if (target.IsBot) return true;
 
-		return target != null && (AdminManager.CanPlayerTarget(controller, target) ||
+		return AdminManager.CanPlayerTarget(controller, target) ||
 		                          AdminManager.CanPlayerTarget(new SteamID(controller.SteamID),
-			                          new SteamID(target.SteamID)));
+			                          new SteamID(target.SteamID));
 	}
 }

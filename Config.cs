@@ -119,5 +119,8 @@ namespace CS2_SimplerAdmin
 
 		[JsonPropertyName("ExpireOldIpBans")]
 		public int ExpireOldIpBans { get; set; } = 0;
+		
+		[JsonPropertyName("ReloadAdminsEveryMapChange")]
+		public bool ReloadAdminsEveryMapChange { get; set; } = false;
 	}
 }
